@@ -1,5 +1,5 @@
 
-import { View, Text, StyleSheet } from 'react-native';
+import { ScrollView, StyleSheet } from 'react-native';
 import Header from './components/Header';
 import Main from './components/Main';
 import Footer from './components/Footer';
@@ -7,17 +7,17 @@ import Footer from './components/Footer';
 export default function App () {
   return(
     
-    <View style={styles.container}>
+   <ScrollView style={styles.container}>
           <Header />
           <Main />
           <Footer />
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#453454",
+    
   }
 })
