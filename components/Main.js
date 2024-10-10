@@ -1,20 +1,115 @@
-import {View, Text, StyleSheet} from 'react-native'
-import { Image } from 'expo-image';
+import { useEffect, useState } from 'react'
+import {View, Text, StyleSheet, TextInput, Pressable} from 'react-native'
+import CardAccount from './CardAccount2'
 
 export default function Main() {
+
+    const [accounts, setAccounts] = useState([])
+    const [txtServico, setTxtServico] = useState('')
+    const [txtUsername, setTxtUsername] = useState('')
+    const [txtPass, setTxtPass] = useState('')
+    const [txtImgUrl, setTxtImgUrl] = useState('')
+
+    useEffect( () => {
+        const getAccounts = async () => {
+            const response = await fetch('http://localhost:3000/account/list')
+            if(response.ok){
+                const data = await response.json()
+                console.log(data)
+                setAccounts(data.accounts)
+                return
+            }
+            console.log(data)
+            return
+        
+        }
+        getAccounts()
+    }, [])
+
+    const handleCreateAccount = async () => {
+        const account = {
+        service: txtServico,   
+        username: txtUsername,
+        logo_image: txtImgUrl,
+        pass: txtPass,
+        user_id: 1
+        }
+   
+
+    const response = await fetch('http://localhost:3000/account/',{
+        method: 'POST',
+        headers:{
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(account)
+    })
+        if(response.ok){
+            const data = await response.json()
+            console.log(data)
+            setAccounts([...accounts, data.account])
+            return
+        }
+        console.log('Erro ao carregar accounts')
+        return
+ }
+
+
     return(
+
+        
         <View style={styles.main}>
-            <View style={styles.user}>
-                <Image
-                style={styles.avatar}
-                source="https://avatars.githubusercontent.com/u/161066132?s=400&u=6509230abb92eeb9737fdecbd8a60b48e4800c65&v=4"
-                />
-            </View> 
-            <View style={styles.gmail}> 
-            <Text style={styles.name}>Gmail</Text>
-            <Text >matheusif@Gmail.com</Text>
-            </View>
             
+            <Text>Serviços</Text>
+            
+            <TextInput 
+                style={input}
+                onChangeText={setTxtServico}
+                value={txtServico}
+                keyboardType='default'
+                placeholder= 'digite o nome do serviço'
+            />
+            <Text>Username</Text>
+            <TextInput 
+                style={input}
+                onChangeText={setTxtUsername}
+                value={txtUsername}
+                keyboardType='default'
+            />
+            <Text>Password</Text>
+            <TextInput 
+                style={input}
+                onChangeText={setTxtPass}
+                value={txtPass}
+                keyboardType='default'
+            />
+            <Text>ImgUrl</Text>
+            <TextInput 
+                style={input}
+                onChangeText={setTxtImgUrl}
+                value={txtImgUrl}
+                keyboardType='url'
+            />
+
+            <Pressable
+            style={button}
+            onPress={handleCreateAccount}
+            >
+                <Text>Cadastrar</Text>
+            </Pressable>
+            
+            {
+                accounts.map( (account) => 
+                <CardAccount
+                    key={account.id}
+                    id={account.id}
+                    service={account.service}
+                    phoneNumber={account.phoneNumber}
+                    userName={account.userName}
+                    accounts={accounts}
+                    setAccounts={setAccounts}
+                  />
+                )
+            }
         </View>
     )
 }
@@ -23,32 +118,32 @@ const styles = StyleSheet.create({
        padding: 15,
        backgroundColor: "#DDDDDD",
        // backgroundColor: "#998754",
-       alignItems:'flex-start',
-       flexDirection:'row',
+       alignItems:'center',
+    //    flexDirection:'row',
        margin: 50,
        borderStyle: 'solid',
-       borderColor: 'red',
-       borderWidth: 1
+       borderColor: 'black',
+       borderWidth: 1,
+       gap:30,
+       paddingLeft: 25,
+       paddingRight: 25
     },
-    user:{
-        flexDirection: 'row',
+    input: {
+        borderWidth: 1,
+        borderStyle: 'solid',
+        borderColor: '#555555',
+        paddingHorizontal: '10',
+        paddingVertical: '6',
+        marginVertical: '5',
+        borderRadius: '5'
+    },
+    button: ({pressed}) => [ {
+        backgroundColor: pressed ? '#CCCCCC': '#DDDDDD',
         alignItems:'center',
-        gap: 10,
-        
-    },
-    avatar: {
-        width:50,
-        height:50,
-        borderRadius:25,
-        margin: 10
-    },
-    name: {
-        fontWeight: 'bold',
-        fontSize: 18,
-},
-    gmail: {
-        margin:12,
-        gap: 3
-    }
+        color:'white',
+        marginVertical:10,
+        borderRadius:10,
+        paddingVertical: 10
 
+    }]
 })
